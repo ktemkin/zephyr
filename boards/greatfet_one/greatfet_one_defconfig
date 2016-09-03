@@ -1,0 +1,22 @@
+CONFIG_ARM=y
+CONFIG_BOARD_GREATFET_ONE=y
+CONFIG_SOC_FAMILY_LPC=y
+CONFIG_SOC_SERIES_LPC43XX=y
+CONFIG_SOC_LPC4330=y
+
+CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC=204000000
+CONFIG_CORTEX_M_SYSTICK=y
+CONFIG_FLASH_SIZE=2048
+CONFIG_XIP=y
+
+# TODO: We currently specify 128KiB of the device's
+# 264KiB, as that's the size of the first contiguous block,
+# and it makes this work with the Zephyr linker script. We
+# may want to reshape this eventually to take advantage of
+# the device's entire SRAM.
+CONFIG_SRAM_SIZE=128
+
+CONFIG_CONSOLE=y
+CONFIG_UART_CONSOLE=y
+CONFIG_SERIAL=y
+

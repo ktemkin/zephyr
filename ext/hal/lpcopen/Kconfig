@@ -16,3 +16,12 @@
 config HAS_LPCOPEN
 	bool
 	depends on SOC_FAMILY_LPC && !HAS_CMSIS
+
+menuconfig LPCOPEN
+	bool "LPCOPEN Driver Support"
+	default y
+	depends on HAS_LPCOPEN
+	help
+  Allow use of drivers based on the LPCOpen abstraction layer.
+
+

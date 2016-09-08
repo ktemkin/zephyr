@@ -1,1 +1,2 @@
 obj-$(CONFIG_SOC_SERIES_LPC43XX) += lpc43xx/
+obj-$(CONFIG_HAS_LPCOPEN) += lpc-zephyr.o

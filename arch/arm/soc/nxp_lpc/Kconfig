@@ -36,3 +36,33 @@ config SOC_PART_NUMBER
 	This string holds the full part number of the SoC. It is a hidden option
 	that you should not set directly. The part number selection choice defines
 	the default value for this string.
+
+
+config XTAL_FREQUENCY
+	int "Crystal Oscillator Frequency"
+	default 12000000
+	help
+	The frequnecy of the crystal oscillator attached to the LPC chip, or 0
+	if not using a crystal (e.g. using CLKIN or the internal oscillator).
+
+
+config SYSCLK_FREQUENCY
+  int "System Clock Frequency (in Hz)"
+	default 204000000
+	help
+	The target frequency for the primary PLL, and main system clock.
+	Should not exceed 204MHz.
+
+config SYSCLK_DELTA
+  int "System Clock Delta (in Hz)"
+	default 0
+	help
+	The maximum clock offset from the SYSCLK_FREQUENCY allowed, in Hz. This
+	is used to set a bound for PLL generation error. This can be zero, but if
+	the SYSCLK_FREQUENCY target isn't meetable, the system will stall.
+
+config CLKIN_FREQUENCY
+	int "Clock Input Frequency"
+	default 0
+	help
+	The frequency of the signal on the clkin pin, or 0 if the clkin pin is unused.

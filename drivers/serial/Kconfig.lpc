@@ -1,0 +1,33 @@
+menuconfig UART_LPC
+	depends on LPCOPEN
+	bool "Driver for LPC-chip UARTs"
+	default y
+	select SERIAL_HAS_DRIVER
+	help
+	  This option enables the LPC UART driver.
+
+	  This driver is simply a shim driver based on the UART driver
+	  provided by LPCOpen.
+
+config UART_LPC_0
+	depends on UART_LPC
+	bool "Enable UART 0 controller"
+	default y
+
+config UART_LPC_0_NAME
+	depends on UART_LPC_0
+	string "UART_0 device name"
+	default "UART_0"
+	help
+	  This option holds the UART_0 device name. If unsure, use the
+	  default name.
+
+config UART_LPC_0_BAUDRATE
+	depends on UART_LPC_0
+	int "UART_0 baud rate"
+	default 115200
+	help
+	  This option sets the baud rate from the UART_0 device.
+
+
+# TODO: Support more UARTs!:

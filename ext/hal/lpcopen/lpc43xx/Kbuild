@@ -1,3 +1,9 @@
 
-# XXX CONFIGURE INDEPENDENTLY XXX
-obj-$(CONFIG_HAS_LPCOPEN) += src/uart_18xx_43xx.o
+# Common requirements for all LPC43XX cores; required by its initialization code.
+obj-$(CONFIG_SOC_SERIES_LPC43XX) += src/sysinit_18xx_43xx.o
+obj-$(CONFIG_SOC_SERIES_LPC43XX) += src/clock_18xx_43xx.o
+
+
+obj-$(CONFIG_UART_LPC) += src/uart_18xx_43xx.o
+
+# XXX MAKE OWN OPTION?

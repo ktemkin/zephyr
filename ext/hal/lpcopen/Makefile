@@ -22,5 +22,5 @@ LPC_SOC_SERIES = $(subst $(DQUOTE),,$(CONFIG_SOC_SERIES))
 KBUILD_CFLAGS += -DCORE_M4
 
 ifdef CONFIG_HAS_LPCOPEN
-	ZEPHYRINCLUDE += -I$(srctree)/ext/hal/lpcopen/$(LPC_SOC_SERIES)/inc
+	ZEPHYRINCLUDE += -isystem$(srctree)/ext/hal/lpcopen/$(LPC_SOC_SERIES)/inc
 endif

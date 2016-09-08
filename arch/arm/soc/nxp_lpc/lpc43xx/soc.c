@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2015 Wind River Systems, Inc.
- * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright (c) 2016, Kyle J. Temkin <kyle@ktemkin.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,6 @@
  * limitations under the License.
  */
 
-/**
- * @file
- * @brief System/hardware module for fsl_frdm_k64f platform
- *
- * This module provides routines to initialize and support board-level
- * hardware for the fsl_frdm_k64f platform.
- */
-
 #include <nanokernel.h>
 #include <device.h>
 #include <init.h>
@@ -31,17 +23,56 @@
 #include <sections.h>
 #include <arch/cpu.h>
 
+#include <chip.h>
+
 
 /**
- *
- * @brief Initialize the system clock
+ * @brief Initialize the core system clock, and set up the main PLL.
  * @return N/A
- *
  */
-static ALWAYS_INLINE void clkInit(void)
+static void lpc43xx_init_core_clock(void)
 {
-    //TODO
+    /*
+     * Determine the system's clock source based on configuration.
+     * If an external crystal frequency has been provided, use the xtal.
+     */
+    CHIP_CGU_CLKIN_T clk_source 
+      = CONFIG_XTAL_FREQUENCY ? CLKIN_CRYSTAL : CLKIN_IRC;
+
+    /* If we're using the XTAL, enable it. */
+    if(clk_source == CLKIN_CRYSTAL)
+        Chip_Clock_EnableCrystal();
+
+    /* Set up the main PLL to generate our core system clock. */
+    Chip_Clock_SetupMainPLLHz(clk_source,
+        CONFIG_SYSCLK_FREQUENCY - CONFIG_SYSCLK_DELTA,
+        CONFIG_SYSCLK_FREQUENCY,
+        CONFIG_SYSCLK_FREQUENCY + CONFIG_SYSCLK_DELTA);
+    Chip_Clock_SetBaseClock(CLK_BASE_MX, CLKIN_MAINPLL, true, false);
 }
+
+
+/**
+ * @brief Initialize the clocks for the system peripherals.
+ * @return N/A
+ */
+static void lpc43xx_init_peripheral_clocks(void)
+{
+    /* Switch the core peripherals over to the main PLL. */
+    Chip_Clock_SetBaseClock(CLK_BASE_PERIPH, CLKIN_MAINPLL, true, false);
+    Chip_Clock_SetBaseClock(CLK_BASE_APB1, CLKIN_MAINPLL, true, false);
+    Chip_Clock_SetBaseClock(CLK_BASE_APB3, CLKIN_MAINPLL, true, false);
+
+    /* Switch the globally-present peripherals over to the main PLL.*/
+    Chip_Clock_SetBaseClock(CLK_BASE_SSP0, CLKIN_MAINPLL, true, false);
+    Chip_Clock_SetBaseClock(CLK_BASE_SSP1, CLKIN_MAINPLL, true, false);
+
+    /*
+     * All other devices should set up their base clock in their driver's
+     * initialization code.
+     */
+}
+
 
 /**
  *
@@ -56,33 +87,34 @@ static ALWAYS_INLINE void clkInit(void)
 
 static int lpc43xx_init(struct device *arg)
 {
-	ARG_UNUSED(arg);
+    ARG_UNUSED(arg);
 
-	int oldLevel; /* old interrupt lock level */
+    int oldLevel; /* old interrupt lock level */
 
-	/* disable interrupts */
-	oldLevel = irq_lock();
+    /* disable interrupts */
+    oldLevel = irq_lock();
 
-	/* clear all faults */
+    /* clear all faults */
 
-	_ScbMemFaultAllFaultsReset();
-	_ScbBusFaultAllFaultsReset();
-	_ScbUsageFaultAllFaultsReset();
+    _ScbMemFaultAllFaultsReset();
+    _ScbBusFaultAllFaultsReset();
+    _ScbUsageFaultAllFaultsReset();
 
-	_ScbHardFaultAllFaultsReset();
+    _ScbHardFaultAllFaultsReset();
 
-	/* Initialize PLL/system clock to 120 MHz */
-	clkInit();
+    /* Initialize our clocks. */
+    lpc43xx_init_core_clock();
+    lpc43xx_init_peripheral_clocks();
 
-	/*
-	 * install default handler that simply resets the CPU
-	 * if configured in the kernel, NOP otherwise
-	 */
-	NMI_INIT();
+    /*
+     * install default handler that simply resets the CPU
+     * if configured in the kernel, NOP otherwise
+     */
+    NMI_INIT();
 
-	/* restore interrupt state */
-	irq_unlock(oldLevel);
-	return 0;
+    /* restore interrupt state */
+    irq_unlock(oldLevel);
+    return 0;
 }
 
 SYS_INIT(lpc43xx_init, PRIMARY, 0);

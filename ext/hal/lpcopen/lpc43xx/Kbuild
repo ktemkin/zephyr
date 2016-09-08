@@ -1,0 +1,3 @@
+
+# XXX CONFIGURE INDEPENDENTLY XXX
+obj-$(CONFIG_HAS_LPCOPEN) += src/uart_18xx_43xx.o

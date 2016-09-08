@@ -1,7 +1,6 @@
-# Kconfig - external HAL source code configuration options
-
+# Makefile - LPCOpen
 #
-# Copyright (c) 2016 Linaro Ltd.
+# Copyright (c) 2016 Kyle J. Temkin <kyle@ktemkin.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,18 +15,12 @@
 # limitations under the License.
 #
 
-# When adding new entries keep the list in alphabetical order
+# Convert the SOC series name into an lpcopen series path.
+LPC_SOC_SERIES = $(subst $(DQUOTE),,$(CONFIG_SOC_SERIES))
 
-menu "HALs"
+# For now, we only support the M4 core of the LPC-series.
+KBUILD_CFLAGS += -DCORE_M4
 
-source "ext/hal/cmsis/Kconfig"
-
-source "ext/hal/ksdk/Kconfig"
-
-source "ext/hal/nordic/mdk/Kconfig"
-
-source "ext/hal/qmsi/Kconfig"
-
-source "ext/hal/lpcopen/Kconfig"
-
-endmenu
+ifdef CONFIG_HAS_LPCOPEN
+	ZEPHYRINCLUDE += -I$(srctree)/ext/hal/lpcopen/$(LPC_SOC_SERIES)/inc
+endif

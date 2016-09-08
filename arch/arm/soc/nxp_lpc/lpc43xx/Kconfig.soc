@@ -21,6 +21,7 @@ depends on SOC_SERIES_LPC43XX
 
 config SOC_LPC4330
 	bool "SOC_LPC4330"
+  select HAS_LPCOPEN
 endchoice
 
 

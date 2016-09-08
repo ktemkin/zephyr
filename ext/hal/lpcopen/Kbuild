@@ -1,0 +1,1 @@
+obj-$(CONFIG_SOC_SERIES_LPC43XX) += lpc43xx/
